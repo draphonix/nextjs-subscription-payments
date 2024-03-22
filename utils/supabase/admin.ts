@@ -49,7 +49,9 @@ const upsertPriceRecord = async (
     unit_amount: price.unit_amount ?? null,
     interval: price.recurring?.interval ?? null,
     interval_count: price.recurring?.interval_count ?? null,
-    trial_period_days: price.recurring?.trial_period_days ?? TRIAL_PERIOD_DAYS
+    trial_period_days: price.recurring?.trial_period_days ?? TRIAL_PERIOD_DAYS,
+    description: null,
+    metadata: null
   };
 
   const { error: upsertError } = await supabaseAdmin
@@ -262,6 +264,24 @@ const manageSubscriptionStatusChange = async (
       ? toDateTime(subscription.trial_end).toISOString()
       : null
   };
+
+  const { data, error } = await supabaseAdmin
+    .from('prices')
+    .select('*')
+    .eq('id', subscriptionData.price_id ?? '')
+    .single();
+
+  if (error) throw new Error(`Price lookup failed: ${error.message}`);
+
+  if (!data) throw new Error(`Price not found: ${subscriptionData.price_id}`);
+
+  const unit_amount = data.unit_amount ?? 0;   
+  
+  // Increase the token balance in the inventory
+  const { data: inventoryData, error: inventoryError } = await supabaseAdmin.rpc('modify_token_balance', { amount: unit_amount, id: uuid })
+
+  if (inventoryError) throw new Error(`Inventory update failed: ${inventoryError.message}`);
+
 
   const { error: upsertError } = await supabaseAdmin
     .from('subscriptions')

@@ -2,13 +2,11 @@
 
 import { use, useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import ImageUploadForm from './upload-image';
+import type { Database, Tables, TablesInsert } from 'types_db';
 
-type Image = {
-  id: string;
-  data: string;
-  created_at: string;
-  modified_data: string;
-};
+type Image = Tables<'images'>;
+// type Image = 
 const supabase = createClient();
 export default function RealtimeImages({
   serverImages
@@ -36,5 +34,30 @@ export default function RealtimeImages({
       supabase.removeChannel(channel);
     };
   }, [supabase, images, setImages]);
-  return <pre>{JSON.stringify(images)}</pre>;
+  return (
+    <pre>
+      {/* Display the images as a table */}
+      <table>
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>created_at</th>
+            <th>origin_image</th>
+          </tr>
+        </thead>
+        <tbody>
+            {images.map((image) => (
+                <tr key={image.id}>
+                    <td>{image.id}</td>
+                    <td>{image.created_at}</td>
+                    <td>
+                        {image.original_base64 && <img src={image.original_base64} />}
+                    </td>
+                </tr>
+            ))}
+        </tbody>
+      </table>
+      <ImageUploadForm />
+    </pre>
+  );
 }

@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import type { Database, Tables, TablesInsert } from 'types_db';
 
-type Image = {
-  id: string;
-  data: string;
-  created_at: string;
-  modified_data: string;
-};
+type Image = Tables<'images'>;
+
 const supabase = createClient();
 export default function RealtimeImage({ serverImage }: { serverImage: Image }) {
   const [image, setImage] = useState(serverImage);
@@ -33,11 +30,13 @@ export default function RealtimeImage({ serverImage }: { serverImage: Image }) {
       supabase.removeChannel(channel);
     };
   }, [supabase, image, setImage]);
-  return <pre>
-    {JSON.stringify(image)}
-    {/* Let create a div that display the binary data as image */}
-    <div>
-      <img src={`data:image/png;base64,${image.data}`} />
-    </div>
-    </pre>;
+return (
+    <pre>
+        {JSON.stringify(image)}
+        {/* Let create a div that display the binary data as image */}
+        <div>
+            {image.original_base64 && <img src={image.original_base64} />}
+        </div>
+    </pre>
+);
 }
