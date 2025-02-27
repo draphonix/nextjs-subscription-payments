@@ -13,7 +13,7 @@ export const columns: ColumnDef<Image>[] = [
       return (
         <Link 
           href={`/images/${id}`} 
-          className="text-blue-500 hover:text-blue-700 hover:underline font-medium"
+          className="text-white hover:text-zinc-300 hover:underline font-medium"
         >
           {id.substring(0, 8)}...
         </Link>
@@ -43,7 +43,7 @@ export const columns: ColumnDef<Image>[] = [
       
       return (
         <Link href={`/images/${id}`}>
-          <div className="w-20 h-20 overflow-hidden rounded border border-gray-700">
+          <div className="w-20 h-20 overflow-hidden rounded border border-zinc-700">
             <img 
               src={base64} 
               alt="Preview" 
@@ -67,7 +67,7 @@ export const columns: ColumnDef<Image>[] = [
       return (
         <Link 
           href={`/images/${id}`}
-          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+          className="px-3 py-1 bg-white text-black text-sm rounded hover:bg-zinc-200"
         >
           View
         </Link>

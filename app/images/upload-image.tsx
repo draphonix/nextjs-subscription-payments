@@ -3,6 +3,10 @@
 import { createClient } from '@/utils/supabase/client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button-shadcn';
+import { Input } from '@/components/ui/Input-shadcn';
+import { Label } from '@/components/ui/Label-shadcn';
+import { Separator } from '@/components/ui/separator';
 
 // Initialize the Supabase client
 const supabase = createClient();
@@ -68,72 +72,49 @@ export default function ImageUploadForm() {
       };
       reader.readAsDataURL(imageData);
     } catch (err) {
-      console.error('Upload error:', err);
-      setUploadError('An unexpected error occurred');
+      console.error('Error uploading image: ', err);
+      setUploadError('Failed to upload image');
       setIsUploading(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-indigo-900 bg-opacity-50 rounded-lg p-4 mb-6">
-        <h3 className="text-lg font-semibold text-indigo-200 mb-2">How it works</h3>
-        <p className="text-indigo-100 text-sm">
-          Upload an image to see it processed. After uploading, your image will be:
-        </p>
-        <ul className="list-disc list-inside text-indigo-100 text-sm mt-2 space-y-1">
-          <li>Stored in the database</li>
-          <li>Processed to create an upscaled version (may take a moment)</li>
-          <li>Available for comparison using our interactive slider</li>
-        </ul>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="image-upload" className="text-white">Select Image</Label>
+        <Input
+          id="image-upload"
+          type="file"
+          onChange={handleImageChange}
+          accept="image/*"
+          className="bg-zinc-800 text-white border-zinc-700 file:bg-white file:text-black file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4 file:hover:bg-zinc-200 cursor-pointer h-auto py-2"
+          disabled={isUploading}
+        />
+        {uploadError && (
+          <p className="text-red-500 text-sm mt-1">{uploadError}</p>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="image-upload" className="block text-sm font-medium text-gray-300">
-            Select an image to upload
-          </label>
-          <input 
-            id="image-upload"
-            type="file" 
-            accept="image/*"
-            onChange={handleImageChange} 
-            className="block w-full text-sm text-gray-400
-              file:mr-4 file:py-2 file:px-4
-              file:rounded file:border-0
-              file:text-sm file:font-semibold
-              file:bg-blue-600 file:text-white
-              hover:file:bg-blue-700
-              cursor-pointer"
-            disabled={isUploading}
-          />
-        </div>
-        
-        {previewUrl && (
-          <div className="mt-4 rounded border border-gray-700 p-2">
-            <p className="text-sm text-gray-400 mb-2">Preview:</p>
-            <img 
-              src={previewUrl} 
-              alt="Preview" 
-              className="max-h-48 max-w-full mx-auto object-contain" 
+      {previewUrl && (
+        <div className="space-y-4">
+          <Separator className="my-4 bg-zinc-700" />
+          <div className="aspect-video relative overflow-hidden rounded-lg border border-zinc-700">
+            <img
+              src={previewUrl}
+              alt="Preview"
+              className="h-full w-full object-contain"
             />
           </div>
-        )}
-        
-        {uploadError && (
-          <div className="text-red-500 text-sm mt-2">
-            {uploadError}
-          </div>
-        )}
-        
-        <button 
-          type="submit" 
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!imageData || isUploading}
-        >
-          {isUploading ? 'Uploading...' : 'Upload Image'}
-        </button>
-      </form>
-    </div>
+        </div>
+      )}
+
+      <Button 
+        type="submit" 
+        disabled={isUploading || !imageData}
+        className="w-full bg-white text-black hover:bg-zinc-200 disabled:bg-zinc-600 disabled:text-zinc-300 disabled:opacity-80"
+      >
+        {isUploading ? 'Uploading...' : 'Upload Image'}
+      </Button>
+    </form>
   );
 }
